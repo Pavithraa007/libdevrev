@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <header>
+        <h1 class="heading">Library Management</h1>
+        <h3 class="title">Login & Registration Form</h3>
+    </header>
+
+   
+    <div class="container">
+       
+        <div class="slider"></div>
+        <div class="btn">
+            <button class="login active" onclick="showLogin()">Login</button>
+            <button class="signup" onclick="showSignup()">Signup</button>
+        </div>
+
+       
+        <div class="form-section">
+            
+            <div class="login-box">
+                <input type="email" class="email ele" placeholder="enter email">
+                <input type="password" class="password ele" placeholder="password">
+                <button class="clkbtn" onclick="login()">submit</button>
+            </div>
+
+            <div class="signup-box">
+                <input type="text" class="name ele" placeholder="Enter name">
+                <input type="email" class="email ele" placeholder="enter email">
+                <input type="password" class="password ele" placeholder="password">
+                <input type="password" class="password ele" placeholder="Confirm password">
+                <input type="ph:no" class="ph:no ele" placeholder="phone number">
+                <button class="clkbtn" onclick="signup()">submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+    <script>
+        function showLogin() {
+            var loginBtn = document.querySelector('.btn .login');
+            var signupBtn = document.querySelector('.btn .signup');
+            var loginBox = document.querySelector('.login-box');
+            var signupBox = document.querySelector('.signup-box');
+
+            loginBtn.classList.add('active');
+            signupBtn.classList.remove('active');
+            loginBox.style.display = 'block';
+            signupBox.style.display = 'none';
+        }
+
+        function showSignup() {
+            var loginBtn = document.querySelector('.btn .login');
+            var signupBtn = document.querySelector('.btn .signup');
+            var loginBox = document.querySelector('.login-box');
+            var signupBox = document.querySelector('.signup-box');
+
+            loginBtn.classList.remove('active');
+            signupBtn.classList.add('active');
+            loginBox.style.display = 'none';
+            signupBox.style.display = 'block';
+        }
+
+        function login() {
+     
+            var email = document.querySelector('.login-box .email').value;
+            var password = document.querySelector('.login-box .password').value;
+
+            window.location.href = "booklist.html";
+        }
+
+        function signup() {
+            
+            var name = document.querySelector('.signup-box .name').value;
+            var email = document.querySelector('.signup-box .email').value;
+            var password = document.querySelector('.signup-box .password').value;
+            var phoneNumber = document.querySelector('.signup-box .ph\\:no').value;
+
+           
+            window.location.href = "booklist.html";
+        }
+    </script>
+</body>
+</html>

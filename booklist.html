@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Tempus Sans ITC;
+            margin: 0;
+            padding: 0;
+            background-image: url('library.jpg');
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgb(208, 230, 230);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #d48d6f;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+       
+
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            background-color:rgb(186, 149, 186);
+            border: 1px solid #080808;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #aa71c3;
+            color: #5a3ac3;
+            border: 1px solid #080808;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #89b0dd;
+        }
+
+        #output {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .book {
+            width: calc(25% - 20px);
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #cf8181;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .author {
+            color:plum;
+            margin-bottom: 10px;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            background-color: #d3a0a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Search BOOK</h1>
+        <div class="search-container">
+            <input id="input" type="text">
+            <button onclick="getbooks()">Search</button>
+        </div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        var currentpage=1;
+        var isLOADING=false;
+        function getbooks(){
+            currentPage=1;
+            loadMoreBooks();
+        }
+
+        function loadMoreBooks() {
+            if(isLOADING) return ;
+            isLOADING=true;
+            document.getElementById('output').innerHTML = "";
+            fetch("http://openlibrary.org/search.json?q=" + document.getElementById("input").value)
+                .then(a => a.json())
+                .then(response => {
+                    for (var i = 0; i < response.docs.length; i++) {
+                        var bookDiv = document.createElement('div');
+                        bookDiv.className = 'book';
+
+                        var title = document.createElement('h2');
+                        title.textContent = response.docs[i].title;
+
+                        var author = document.createElement('div');
+                        author.className = 'author';
+                        author.textContent = response.docs[i].author_name ? 'by ' + response.docs[i].author_name.join(', ') : 'Unknown';
+
+                        var image = document.createElement('img');
+                        image.src = 'http://covers.openlibrary.org/b/isbn/' + (response.docs[i].isbn ? response.docs[i].isbn[0] : '') + '-M.jpg';
+
+                        bookDiv.appendChild(title);
+                        bookDiv.appendChild(author);
+                        bookDiv.appendChild(image);
+
+                        document.getElementById("output").appendChild(bookDiv);
+                    }
+                    currentpage++;
+                    isLOADING=false;
+                });
+        }
+        function checkScroll() {
+            var windowHeight = window.innerHeight || document.documentElement.clientHeight;
+            var documentHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+            var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+
+            if (documentHeight - (windowHeight + scrollTop) < 100) {
+                loadMoreBooks();
+            }
+            window.location.href = "purchase.html";
+        }
+
+        window.addEventListener('scroll', checkScroll);
+       
+
+
+    </script>
+</body>
+</html> 
+

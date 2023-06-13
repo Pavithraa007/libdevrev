@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Tempus Sans ITC;
+            margin: 0;
+            padding: 0;
+            background-image: url('library.jpg');
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgb(208, 230, 230);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #d48d6f;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: rgb(186, 149, 186);
+            border: 1px solid #080808;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #aa71c3;
+            color: #5a3ac3;
+            border: 1px solid #080808;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #89b0dd;
+        }
+
+        #output {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .book {
+            width: calc(25% - 20px);
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #cf8181;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .author {
+            color: plum;
+            margin-bottom: 10px;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            background-color: #d3a0a0;
+        }
+
+        .cart-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .cart {
+            background-color: #d48d6f;
+            padding: 10px;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .checkout-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .checkout-modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        .checkout-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .checkout-modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .checkout-modal-close {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .checkout-modal-items {
+            margin-bottom: 20px;
+        }
+
+        .checkout-modal-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .checkout-modal-item-title {
+            font-weight: bold;
+        }
+
+        .checkout-modal-total {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .checkout-modal-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #aa71c3;
+            color: #5a3ac3;
+            border: 1px solid #080808;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .checkout-modal-button:hover {
+            background-color: #89b0dd;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Library purchase</h1>
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search for a book...">
+        <button onclick="searchBooks()">Search</button>
+    </div>
+    <div id="output"></div>
+    <div class="cart-container">
+        <div class="cart" onclick="showCheckoutModal()">Cart (<span id="cart-count">0</span>)</div>
+    </div>
+</div>
+<div id="checkout-modal" class="checkout-modal">
+    <div class="checkout-modal-content">
+        <div class="checkout-modal-header">
+            <div class="checkout-modal-title">start purchase</div>
+            <div class="checkout-modal-close" onclick="hideCheckoutModal()">&times;</div>
+        </div>
+        <div class="checkout-modal-items" id="checkout-modal-items"></div>
+        <div class="checkout-modal-total" id="checkout-modal-total">Total: $0</div>
+        <button class="checkout-modal-button" onclick="checkout()">Checkout</button>
+    </div>
+</div>
+
+</div>
+
+
+<div class="completed-container">
+    <button onclick="redirectToThankYouPage()">completed</button>
+</div>
+
+<script>
+   
+    var books = [
+        {
+            title: "romeo juliet",
+            author: "William Shakespeare",
+            image: "book1.jpeg",
+            price: 10,
+            availability: 5,
+            copies: 5
+        },
+        {
+            title: "Love like crazy",
+            author: "Niki ambers",
+            image: "book2.jpg",
+            price: 15,
+            availability: 3,
+            copies: 3
+        },
+        {
+            title: "Girl in room 105",
+            author: "chetan bhagat",
+            image: "book3.jpg",
+            price: 20,
+            availability: 2,
+            copies: 2
+        }
+    ];
+
+    var cart = [];
+
+   
+    displayBooks();
+
+    function displayBooks() {
+        var output = document.getElementById("output");
+        output.innerHTML = "";
+
+        for (var i = 0; i < books.length; i++) {
+            var book = books[i];
+
+            var bookElement = document.createElement("div");
+            bookElement.className = "book";
+
+            var titleElement = document.createElement("h2");
+            titleElement.textContent = book.title;
+
+            var authorElement = document.createElement("div");
+            authorElement.className = "author";
+            authorElement.textContent = "By " + book.author;
+
+            var imageElement = document.createElement("img");
+            imageElement.src = book.image;
+
+            var availabilityElement = document.createElement("div");
+            availabilityElement.textContent = "Availability: " + book.availability;
+
+            var addButton = document.createElement("button");
+            addButton.textContent = "Add to Cart";
+            addButton.addEventListener("click", addToCart.bind(null, book));
+
+            bookElement.appendChild(titleElement);
+            bookElement.appendChild(authorElement);
+            bookElement.appendChild(imageElement);
+            bookElement.appendChild(availabilityElement);
+            bookElement.appendChild(addButton);
+
+            output.appendChild(bookElement);
+        }
+    }
+
+    function searchBooks() {
+        var searchInput = document.getElementById("search-input").value.toLowerCase();
+        var filteredBooks = books.filter(function (book) {
+            return book.title.toLowerCase().includes(searchInput) || book.author.toLowerCase().includes(searchInput);
+        });
+
+        displayBooks(filteredBooks);
+    }
+
+   
+    function addToCart(book) {
+        if (book.availability > 0) {
+            var existingCartItem = cart.find(function (item) {
+                return item.title === book.title;
+            });
+
+            if (existingCartItem) {
+                existingCartItem.quantity++;
+            } else {
+                var cartItem = {
+                    title: book.title,
+                    price: book.price,
+                    quantity: 1
+                };
+                cart.push(cartItem);
+            }
+
+            book.availability--;
+            book.copies--;
+
+            updateCartCount();
+        }
+    }
+
+    function updateCartCount() {
+        var cartCount = document.getElementById("cart-count");
+        cartCount.textContent = cart.length;
+    }
+
+    function showCheckoutModal() {
+        var checkoutModal = document.getElementById("checkout-modal");
+        checkoutModal.style.display = "block";
+
+        var checkoutModalItems = document.getElementById("checkout-modal-items");
+        checkoutModalItems.innerHTML = "";
+
+        var total = 0;
+
+        for (var i = 0; i < cart.length; i++) {
+            var cartItem = cart[i];
+
+            var itemElement = document.createElement("div");
+            itemElement.className = "checkout-modal-item";
+
+            var titleElement = document.createElement("div");
+            titleElement.className = "checkout-modal-item-title";
+            titleElement.textContent = cartItem.title;
+
+            var quantityElement = document.createElement("div");
+            quantityElement.textContent = "Quantity: " + cartItem.quantity;
+
+            var priceElement = document.createElement("div");
+            priceElement.textContent = "Price: $" + cartItem.price;
+
+            itemElement.appendChild(titleElement);
+            itemElement.appendChild(quantityElement);
+            itemElement.appendChild(priceElement);
+
+            checkoutModalItems.appendChild(itemElement);
+
+            total += cartItem.price * cartItem.quantity;
+        }
+
+        var totalElement = document.getElementById("checkout-modal-total");
+        totalElement.textContent = "Total: $" + total.toFixed(2);
+    }
+
+    function hideCheckoutModal() {
+        var checkoutModal = document.getElementById("checkout-modal");
+        checkoutModal.style.display = "none";
+    }
+
+  
+    function checkout() {
+        for (var i = 0; i < cart.length; i++) {
+            var cartItem = cart[i];
+
+            var book = books.find(function (book) {
+                return book.title === cartItem.title;
+            });
+
+            if (book) {
+                book.availability -= cartItem.quantity;
+                book.copies -= cartItem.quantity;
+            }
+        }
+
+        cart = [];
+        updateCartCount();
+        hideCheckoutModal();
+        displayBooks();
+        redirectToThankYouPage(); 
+        
+    } 
+    function redirectToThankYouPage() {
+        
+        window.location.href = "Thankyou.html";
+    }
+   
+</script>
+</body>
+</html>
